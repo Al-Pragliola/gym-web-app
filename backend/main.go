@@ -13,9 +13,9 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/gorilla/sessions"
+	_ "github.com/mattn/go-sqlite3" // Standard CGO driver
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	_ "modernc.org/sqlite"
 )
 
 var (
@@ -155,18 +155,15 @@ func main() {
 		os.Remove(dummyFile)
 	}
 
-	// Try disabling memory mapping (mmap). 
-	// Railway volumes might not support mmap, causing "out of memory (14)" errors in the modernc driver.
-	db, err = sql.Open("sqlite", absPath+"?_pragma=mmap_size(0)&_pragma=journal_mode(DELETE)&_busy_timeout=5000")
+	// Standard connection string for mattn/go-sqlite3
+	db, err = sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatalf("sql.Open failed: %v", err)
 	}
 	defer db.Close()
 
 	if err := db.Ping(); err != nil {
-		log.Printf("db.Ping failed: %v", err)
-		// Last resort fallback
-		log.Fatal("Could not open database even with mmap disabled.")
+		log.Fatalf("db.Ping failed: %v", err)
 	}
 
 	if err := initDB(); err != nil {
