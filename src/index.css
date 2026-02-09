@@ -1,0 +1,55 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+#root {
+  width: 100%;
+}
+
+/* Mobile optimizations */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Ensure inputs are large enough for touch */
+.form-control-sm {
+  height: 40px;
+  font-size: 1rem;
+}
+
+/* Cards feel better on mobile with less border */
+.card {
+  border-radius: 12px;
+  border: none;
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+/* Tappable buttons */
+.btn {
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+}
+
+/* Sticky top fix for some mobile browsers */
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
