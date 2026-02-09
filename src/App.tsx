@@ -8,7 +8,7 @@ import History from './pages/History';
 import Login from './pages/Login';
 import Exercises from './pages/Exercises';
 import Progress from './pages/Progress';
-import { Settings, Home, History as HistoryIcon, LogOut, User as UserIcon, Dumbbell, TrendingUp } from 'lucide-react';
+import { Settings, Home, History as HistoryIcon, LogOut, Dumbbell, TrendingUp } from 'lucide-react';
 import { checkAuth } from './utils/storage';
 import type { User } from './types';
 

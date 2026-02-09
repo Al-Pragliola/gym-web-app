@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Card, Form, Container, Spinner } from 'react-bootstrap';
+import { Card, Form, Spinner } from 'react-bootstrap';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { fetchData } from '../utils/storage';
-import type { AppData, WorkoutSession } from '../types';
+import type { WorkoutSession } from '../types';
 import { TrendingUp } from 'lucide-react';
 
 const Progress = () => {

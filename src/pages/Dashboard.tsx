@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Button, Card, Col, Row, Badge, Accordion } from 'react-bootstrap';
+import { Button, Card, Col, Row } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { fetchData } from '../utils/storage';
 import type { Workout } from '../types';
-import { Play, ChevronRight } from 'lucide-react';
+import { Play } from 'lucide-react';
 
 const Dashboard = () => {
   const [workouts, setWorkouts] = useState<Workout[]>([]);

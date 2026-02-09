@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Card, Form, Table, Dropdown } from 'react-bootstrap';
 import { fetchData, addSession } from '../utils/storage';
-import type { Day, ExerciseLog, WorkoutSet, WorkoutSession, AppData, WorkoutDayExercise } from '../types';
+import type { Day, ExerciseLog, WorkoutSet, WorkoutSession } from '../types';
 import { Plus, Trash2, CheckCircle, Calendar as CalendarIcon, RefreshCw } from 'lucide-react';
 
 import RestTimer from '../components/RestTimer';
