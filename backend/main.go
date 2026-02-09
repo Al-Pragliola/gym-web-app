@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/google/uuid"
@@ -135,7 +136,16 @@ func main() {
 	if dbPath == "" {
 		dbPath = "./gym.db"
 	}
-	db, err = sql.Open("sqlite", dbPath)
+
+	// Ensure the directory for the database file exists
+	dbDir := filepath.Dir(dbPath)
+	if err := os.MkdirAll(dbDir, 0755); err != nil {
+		log.Fatalf("failed to create database directory: %v", err)
+	}
+
+	// Use DELETE journal mode to avoid shared memory (/dev/shm) issues in restricted containers
+	// Increase busy_timeout to handle volume latency
+	db, err = sql.Open("sqlite", dbPath+"?_pragma=journal_mode(DELETE)&_busy_timeout=5000")
 	if err != nil {
 		log.Fatal(err)
 	}
