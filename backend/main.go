@@ -140,6 +140,14 @@ func main() {
 	absPath, _ := filepath.Abs(dbPath)
 	log.Printf("Attempting to open database at: %s", absPath)
 
+	// Check if the path is actually a directory (common Docker volume mount mistake)
+	info, err := os.Stat(absPath)
+	if err == nil && info.IsDir() {
+		log.Printf("Warning: DB_PATH %s is a directory. Appending /data.sqlite", absPath)
+		absPath = filepath.Join(absPath, "data.sqlite")
+		log.Printf("New database path: %s", absPath)
+	}
+
 	// Ensure the directory for the database file exists
 	dbDir := filepath.Dir(absPath)
 	if err := os.MkdirAll(dbDir, 0755); err != nil {
@@ -742,7 +750,8 @@ func handleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	session.Values["user_id"] = googleUser.ID
 	session.Save(r, w)
 
-	http.Redirect(w, r, "http://localhost:5173/", http.StatusTemporaryRedirect)
+	// Redirect to frontend (relative path handles both dev and prod)
+	http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 }
 
 func handleLogout(w http.ResponseWriter, r *http.Request) {
