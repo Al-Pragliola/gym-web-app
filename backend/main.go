@@ -155,24 +155,18 @@ func main() {
 		os.Remove(dummyFile)
 	}
 
-	// Use a simpler connection string. Some versions of the pure-Go driver 
-	// throw OOM (14) if the URI parameters are malformed or unsupported by the volume.
-	db, err = sql.Open("sqlite", absPath)
+	// Try disabling memory mapping (mmap). 
+	// Railway volumes might not support mmap, causing "out of memory (14)" errors in the modernc driver.
+	db, err = sql.Open("sqlite", absPath+"?_pragma=mmap_size(0)&_pragma=journal_mode(DELETE)&_busy_timeout=5000")
 	if err != nil {
 		log.Fatalf("sql.Open failed: %v", err)
 	}
 	defer db.Close()
 
-	// Ping to trigger the actual file open
 	if err := db.Ping(); err != nil {
-		log.Printf("db.Ping failed (this usually triggers the OOM 14): %v", err)
-		// Fallback: try with nolock if it's a filesystem issue
-		log.Println("Retrying with nolock=1...")
-		db.Close()
-		db, err = sql.Open("sqlite", absPath+"?_nolock=1")
-		if err != nil {
-			log.Fatal(err)
-		}
+		log.Printf("db.Ping failed: %v", err)
+		// Last resort fallback
+		log.Fatal("Could not open database even with mmap disabled.")
 	}
 
 	if err := initDB(); err != nil {
