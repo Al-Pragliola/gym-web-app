@@ -137,19 +137,43 @@ func main() {
 		dbPath = "./gym.db"
 	}
 
+	absPath, _ := filepath.Abs(dbPath)
+	log.Printf("Attempting to open database at: %s", absPath)
+
 	// Ensure the directory for the database file exists
-	dbDir := filepath.Dir(dbPath)
+	dbDir := filepath.Dir(absPath)
 	if err := os.MkdirAll(dbDir, 0755); err != nil {
-		log.Fatalf("failed to create database directory: %v", err)
+		log.Fatalf("Critical: failed to create database directory %s: %v", dbDir, err)
 	}
 
-	// Use DELETE journal mode to avoid shared memory (/dev/shm) issues in restricted containers
-	// Increase busy_timeout to handle volume latency
-	db, err = sql.Open("sqlite", dbPath+"?_pragma=journal_mode(DELETE)&_busy_timeout=5000")
+	// Diagnostic: Try to create a dummy file to verify write permissions
+	dummyFile := filepath.Join(dbDir, ".write_test")
+	if err := os.WriteFile(dummyFile, []byte("test"), 0644); err != nil {
+		log.Printf("Warning: Directory %s does not seem writable: %v", dbDir, err)
+	} else {
+		log.Printf("Directory %s is writable", dbDir)
+		os.Remove(dummyFile)
+	}
+
+	// Use a simpler connection string. Some versions of the pure-Go driver 
+	// throw OOM (14) if the URI parameters are malformed or unsupported by the volume.
+	db, err = sql.Open("sqlite", absPath)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("sql.Open failed: %v", err)
 	}
 	defer db.Close()
+
+	// Ping to trigger the actual file open
+	if err := db.Ping(); err != nil {
+		log.Printf("db.Ping failed (this usually triggers the OOM 14): %v", err)
+		// Fallback: try with nolock if it's a filesystem issue
+		log.Println("Retrying with nolock=1...")
+		db.Close()
+		db, err = sql.Open("sqlite", absPath+"?_nolock=1")
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	if err := initDB(); err != nil {
 		log.Fatal(err)
